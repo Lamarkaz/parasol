@@ -16,7 +16,7 @@ var colors = require('colors');
 
 program
   .version('1.0.0')
-  .option('init', 'Initialize a new contractor project in this folder')
+  .option('init', 'Initialize a new Parasol project in this folder')
   .option('dev', 'Run development environment (Default)')
   .option('deploy [network]', 'Deploy to network (Default network: Mainnet)')
   .option('test', 'Run unit tests')
@@ -122,8 +122,8 @@ program
 }
 
 if (program.dev || !process.argv.slice(2).length) {
-    if (fs.existsSync("./contractor.js")) {
-        var config = require(process.cwd()+'/contractor.js');
+    if (fs.existsSync("./parasol.js")) {
+        var config = require(process.cwd()+'/parasol.js');
         var web3 = new Web3(ganache.provider(config.dev));
         console.log(('Ethereum development network running on port ' + config.dev.port).blue)
         web3.eth.getAccounts().then(function(accounts){
@@ -136,17 +136,17 @@ if (program.dev || !process.argv.slice(2).length) {
             });
         })
     } else {
-        console.log('This is not a valid Contractor project. Please run "contractor init" in an empty directory to initialize a new project.'.red)
+        console.log('This is not a valid Parasol project. Please run "parasol init" in an empty directory to initialize a new project.'.red)
     }
 }
 
 if (program.init) {
-    if(fs.existsSync("./contractor.js")){
-        console.log('This directory already contains a Contractor project'.red)
+    if(fs.existsSync("./parasol.js")){
+        console.log('This directory already contains a Parasol project'.red)
     } else {
         try {
             fse.copySync(__dirname + '/init/', './')
-            console.log('Contractor project created successfully!'.green)
+            console.log('Parasol project created successfully!'.green)
           } catch (err) {
             console.error(err.red)
           }
@@ -154,28 +154,28 @@ if (program.init) {
 }
 
 if(program.test) {
-    if (fs.existsSync("./contractor.js")) {
-        var config = require(process.cwd()+'/contractor.js');
+    if (fs.existsSync("./parasol.js")) {
+        var config = require(process.cwd()+'/parasol.js');
         var web3 = new Web3(ganache.provider(config.dev));
         console.log(('Ethereum development network running on port ' + config.dev.port).blue)
         web3.eth.getAccounts().then(function(accounts){
             compile(web3, accounts, "dev");
         })
     } else {
-        console.log('This is not a valid Contractor project. Please run "contractor init" in an empty directory to initialize a new project.'.red)
+        console.log('This is not a valid Parasol project. Please run "parasol init" in an empty directory to initialize a new project.'.red)
     }
 }
 
 if(program.deploy) {
-    if (fs.existsSync("./contractor.js")) {
+    if (fs.existsSync("./parasol.js")) {
         if(program.deploy === true){
             program.deploy = "mainnet"
         }
-        var config = require(process.cwd()+'/contractor.js');
+        var config = require(process.cwd()+'/parasol.js');
         var secrets = require(process.cwd()+'/secrets.json');
         console.log(('Deploying contracts to ' + program.deploy).blue)
         compile(web3, secrets, program.deploy);
     } else {
-        console.log('This is not a valid Contractor project. Please run "contractor init" in an empty directory to initialize a new project.'.red)
+        console.log('This is not a valid Parasol project. Please run "parasol init" in an empty directory to initialize a new project.'.red)
     }    
 }

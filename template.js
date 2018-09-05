@@ -8,7 +8,8 @@ const template = `
 {{output.devdoc.title}}
 
 {{#each output.abi}}
- ##### {{type}} {{name}} {{#if constant}}constant{{/if}} {{stateMutability}} {{#if payable}}payable{{/if}} \`{{signature}}\` {{#if devdoc.author}}by {{devdoc.author}}{{/if}}
+ ##### {{type}} {{name}} \`{{signature}}\` {{#if devdoc.author}}by {{devdoc.author}}{{/if}}
+ {{#if constant}}constant{{/if}} {{stateMutability}} {{#if payable}}payable{{/if}}
 {{devdoc.details}}
 
 {{#if inputs}}
@@ -18,6 +19,7 @@ const template = `
 {{#each inputs}}
 | {{type}} | {{name}} |
 {{/each}}
+___
 {{/each}}
 
 {{/each}}

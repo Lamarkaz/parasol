@@ -19,6 +19,7 @@ Agile development is important for the entire smart contract development cycle, 
 
 ## Installation
 `sudo npm -g parasol-cli`
+
 `parasol --help` for list of commands
 ## Usage
 

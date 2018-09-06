@@ -6,12 +6,12 @@ Powerful Smart Contract Development Environment
 * Integrated Markdown contract documentation using Natspec + ABI
 * Extended Mocha unit tests
 * Auto-recompiling, tests & documentation on file change
-* Unlimited cutomizability, exposure of all dependency configs
+* Unlimited customizability, exposure of all dependency configs
 * Unopinionated design, low design pattern restrictions
 
 ## Principles
 #### 1. Separation of Concerns
-Most existing development environments are designed for dApps, not for smart contracts. Developers are restricted to the Migration smart contracts design pattern as required by other development environments to faciliate dApp versioning. Parasol puts into consideration developers who intend to develop pure smart contracts and avoids restricting them to a specific dApp design pattern.
+Most existing development environments are designed for dApps, not for smart contracts. Developers are restricted to the Migration smart contracts design pattern as required by other development environments to facilitate dApp versioning. Parasol puts into consideration developers who intend to develop pure smart contracts and avoids restricting them to a specific dApp design pattern.
 #### 2. Freedom
 Parasol aims to implement as little abstraction on top of its dependencies as possible. It provides direct configuration access to its core components such as [solc](https://github.com/ethereum/solc-js) and [ganache](https://github.com/trufflesuite/ganache-cli). Additionally, it allows the user the freedom to customize and contract deployment logic through the `deployer()` function in the configuration file.
 #### 3. Agility

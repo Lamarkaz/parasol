@@ -30,6 +30,8 @@ Agile development is important for the entire smart contract development cycle, 
 ##### Run development environment:
 `parasol`
 
+## [Documentation](https://developer.lamarkaz.com/parasol/)
+
 ## Interactive Javascript Session
 The development environment will automatically spawn a REPL Javascript interative session on startup. The new session allows you to interact synchronously with your deployed contracts and the web3 instance. It also allows you access to a set of handy global variables.
 

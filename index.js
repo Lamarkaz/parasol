@@ -10,7 +10,6 @@ var read = require('fs-readdir-recursive')
 var docs = require('./docs.js')
 var Web3 = require('web3');
 var rimraf = require('rimraf');
-var Mocha = require('mocha');
 var path = require('path');
 var colors = require('colors');
 
@@ -22,6 +21,7 @@ program
   .option('test', 'Run unit tests')
   .parse(process.argv);
 
+  
   var compile = async function(web3, accounts, network) {
     var networklist = ['mainnet', 'ropsten', 'infuranet', 'kovan', 'rinkeby']
     if((networklist.indexOf(network) > -1)) {
@@ -90,18 +90,19 @@ program
         }
         config.deployer(instances, network, web3, function(contracts, net){
             if(net === "dev"){ // Only runs tests in dev environment
+                var Mocha = require('mocha');
                 var mocha = new Mocha();
                 var testDir = process.cwd() + '/tests'
                 // Add each .js file to th e mocha instance
-                fs.readdirSync(testDir).filter(function(file){
+                var files = fs.readdirSync(testDir).filter(function(file){
                     // Only keep the .js files
                     return file.substr(-3) === '.js';
 
-                }).forEach(function(file){
-                    mocha.addFile(
-                        path.join(testDir, file)
-                    );
-                });
+                })
+                for (var i = 0; i < files.length; i++) {
+                    delete require.cache[require.resolve(path.join(testDir, files[i]))]
+                    mocha.addFile(path.join(testDir, files[i]))
+                }
                 // In order to pass contracts to mocha tests
                 global.web3 = web3;
                 global.contracts = contracts;
@@ -112,9 +113,8 @@ program
                     global.assert(e.results[Object.keys(e.results)[0]].error, 'revert')
                 }
                 // Run the tests.
-                mocha.run(function(failures){
-                process.exitCode = failures ? -1 : 0;  // exit with non-zero status if there were failures
-                });
+
+                mocha.run();
             }
         });
         docs(contractDocs)
@@ -130,7 +130,7 @@ if (program.dev || !process.argv.slice(2).length) {
             compile(web3, accounts, "dev");
             watch('./', { recursive: true }, function(evt, name) {
                 if((name.endsWith('.json') || name.endsWith('.js') || name.endsWith('.sol')) && !name.startsWith('ABI/')) {
-                    console.log(('%s changed. Recompiling.', name).blue);
+                    console.log('%s changed. Recompiling.'.blue, name);
                     compile(web3, accounts, "dev")
                 }
             });

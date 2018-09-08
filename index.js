@@ -12,6 +12,10 @@ var Web3 = require('web3');
 var rimraf = require('rimraf');
 var path = require('path');
 var colors = require('colors');
+var repl = require('repl');
+var stubber = require('async-repl/stubber');
+
+var replInstance = null;
 
 program
   .version('1.0.0')
@@ -72,6 +76,8 @@ program
     }
     if(abort) {
         console.log("Errors have been found while compiling contracts. Aborting.".red)
+        watcher.close();
+        process.exit()
     }else{
         rimraf.sync(process.cwd() + '/ABI/*');
         var contractDocs = [];
@@ -87,6 +93,9 @@ program
             instances[contractName] = instance;
             var filename = contractName.replace(".","_").replace(":","-") + '.json';
             fse.outputFileSync(process.cwd() + '/ABI/' + filename,JSON.stringify(ABI, null, 2),{encoding:'utf8',flag:'w'});
+        }
+        if(network === "dev" && (program.dev || !process.argv.slice(2).length)) {
+            replInstance.displayPrompt()
         }
         config.deployer(instances, network, web3, function(contracts, net){
             if(net === "dev"){ // Only runs tests in dev environment
@@ -114,7 +123,11 @@ program
                 }
                 // Run the tests.
 
-                mocha.run();
+                mocha.run(function(){
+                    if(network === "dev" && (program.dev || !process.argv.slice(2).length)) {
+                        replInstance.displayPrompt()
+                    }
+                });
             }
         });
         docs(contractDocs)
@@ -127,11 +140,58 @@ if (program.dev || !process.argv.slice(2).length) {
         var web3 = new Web3(ganache.provider(config.dev));
         console.log(('Ethereum development network running on port ' + config.dev.port).blue)
         web3.eth.getAccounts().then(function(accounts){
+            replInstance = repl.start({ prompt: 'parasol> '.bold.cyan, useGlobal:true, ignoreUndefined:true, useColors:true });
+            replInstance.defineCommand('help', {
+                action: function(){
+                    console.log(`
+Parasol global variables:
+    web3         web3 1.0 already attached to the Ganache provider and 10 generated accounts funded with 100 ETH each
+    contracts    Object of contract instances deployed on ganache. Key is relative location from contracts/ folder + ":" + contract name
+    address0     Short for 0x00000000000000000000000000000000000 also known as address(0) in solidity. Useful to reduce code redundancy
+    accounts     Array of public Ethereum addresses of accounts attached to the above web3 instance
+    assert       The native Node.js assertion module required for basic unit tests
+    assertRevert Special assertion function used to assert failure of a web3 send transaction. Takes a Promise error as an argument.
+Parasol commands:
+    .recompile   Recompile all contracts, redeploy on devnet, recompile docs & run tests
+    .deploy      .deploy [network] will deploy contracts to [network] (Default network is mainnet)
+REPL commands:
+    .break       Sometimes you get stuck, this gets you out
+    .clear       Alias for .break
+    .editor      Enter editor mode
+    .exit        Exit the repl
+    .help        Print this help message
+    .history     Show the history
+    .load        Load JS from a file into the REPL session
+    .save        Save all evaluated commands in this REPL session to a file
+Documentation:
+    https://developer.lamarkaz.com/parasol
+                    `)
+                    replInstance.displayPrompt()
+                }
+            })
+            replInstance.defineCommand('recompile', {
+                action: function(){
+                    compile(web3, accounts, "dev")
+                }
+            })
+            replInstance.defineCommand('deploy', {
+                action: function(network){
+                    console.log(network)
+                    deploy(network)
+                }
+            })
+            replInstance.on('exit', () => {
+                console.log('Shutting down Parasol development environment'.blue);
+                watcher.close();
+                process.exit();
+            });
+            stubber(replInstance);
             compile(web3, accounts, "dev");
-            watch('./', { recursive: true }, function(evt, name) {
+            global.watcher = watch('./', { recursive: true }, function(evt, name) {
                 if((name.endsWith('.json') || name.endsWith('.js') || name.endsWith('.sol')) && !name.startsWith('ABI/')) {
                     console.log('%s changed. Recompiling.'.blue, name);
                     compile(web3, accounts, "dev")
+                    replInstance.displayPrompt()
                 }
             });
         })
@@ -166,15 +226,19 @@ if(program.test) {
     }
 }
 
+global.deploy = function(network){
+    if(network === true || network === ""){
+        network = "mainnet"
+    }
+    var config = require(process.cwd()+'/parasol.js');
+    var secrets = require(process.cwd()+'/secrets.json');
+    console.log(('Deploying contracts to ' + network).blue)
+    compile(web3, secrets, network);
+}
+
 if(program.deploy) {
     if (fs.existsSync("./parasol.js")) {
-        if(program.deploy === true){
-            program.deploy = "mainnet"
-        }
-        var config = require(process.cwd()+'/parasol.js');
-        var secrets = require(process.cwd()+'/secrets.json');
-        console.log(('Deploying contracts to ' + program.deploy).blue)
-        compile(web3, secrets, program.deploy);
+        deploy(program.deploy)
     } else {
         console.log('This is not a valid Parasol project. Please run "parasol init" in an empty directory to initialize a new project.'.red)
     }    

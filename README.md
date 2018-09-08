@@ -3,6 +3,7 @@ Powerful Smart Contract Development Environment
 
 ## Features
 * Instant zero-configuration contract deployments using INFURA
+* Async-REPL Javascript session to interact with contracts & web3
 * Integrated Markdown contract documentation using Natspec + ABI
 * Extended Mocha unit tests
 * Auto-recompiling, tests & documentation on file change
@@ -28,6 +29,20 @@ Agile development is important for the entire smart contract development cycle, 
 
 ##### Run development environment:
 `parasol`
+
+## Interactive Javascript Session
+The development environment will automatically spawn a REPL Javascript interative session on startup. The new session allows you to interact synchronously with your deployed contracts and the web3 instance. It also allows you access to a set of handy global variables.
+
+In order to print the list of available global variables and commands just type `.help` in the interactive shell.
+
+A nice feature of the parasol session is that it automatically handles Promises synchronously. This makes life easier when interacting with contracts and web3.
+
+For example, in the default Parasol installation, if you run this:
+
+`contracts['Token.sol:Token'].methods.name().call()`
+
+The session will return the token name `'Token'` instead of a Promise.
+Notice that you don't even need to type `await` before the Promise call. It is automatically appended.
 
 ## Contract Deployment
 INFURA.io is the default node endpoint for Parasol deployments on all supported networks. The available networks are: `mainnet`, `ropsten`, `kovan`, `rinkeby` and `infuranet`

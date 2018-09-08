@@ -29,6 +29,8 @@ Agile development is important for the entire smart contract development cycle, 
 ##### Run development environment:
 `parasol`
 
+## [Documentation](https://developer.lamarkaz.com/parasol/)
+
 ## Contract Deployment
 INFURA.io is the default node endpoint for Parasol deployments on all supported networks. The available networks are: `mainnet`, `ropsten`, `kovan`, `rinkeby` and `infuranet`
 1. Create a `secrets.json` file in your project directory containing an array of at least one private key with sufficient balance to deploy contracts.

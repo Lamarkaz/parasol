@@ -52,10 +52,10 @@ INFURA.io is the default node endpoint for Parasol deployments on all supported 
 `["YOURPRIVATEKEY"]`
 Don't worry, this file is `.gitignore`d on the repo. It will never be exposed using Git.
 2. Select your network of choice and run the following command:
-`parasol deploy [network]` where `[network]` is a network from the list above. The Default network is `mainnet`.
+`parasol deploy [network]` where `[network]` is a network from the list above.
 If you only run `parasol deploy`, the contracts will be deployed to the mainnet by default.
 3. To interact with your live contracts using the interactive Javascript session, simply type:
-`parasol interact [network]` where `[network]` is a network from the list above. The Default network is `mainnet`.
+`parasol interact [network]` where `[network]` is a network from the list above. The default network is `mainnet`.
 
 ## Project Structure
 After running `parasol init`, the resulting project structure is described below. All top-level directories and files are required for Parasol to function properly. That said, feel free to modify anything if you know what you're doing.

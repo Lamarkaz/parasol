@@ -31,7 +31,7 @@ module.exports = {
           }
         }
     },
-    deployer: async function (contracts, network, web3, test) {
+    deployer: async function (contracts, network, web3, test, save) {
         for (var contract in contracts) {
             var gasPrice = "50000000000"; //50 Gwei
             if(network === "dev") {
@@ -40,6 +40,7 @@ module.exports = {
             contracts[contract] = await contracts[contract].deploy().send({from: web3.eth.accounts[0], gasPrice, gas:1000000})
             console.log(contract + " deployed at address " + contracts[contract].options.address)
         }
-        test(contracts, network) // Call the test function if you want to run unit tests after deployment. Tests will only run if network is dev
+        save(contracts) // Saves contract addresses to addressbook.json. Development addresses will never be saved to addressbook.
+        test(contracts) // Call the test function if you want to run unit tests after deployment. Tests will only run if network is dev
     }
 }

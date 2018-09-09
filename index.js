@@ -14,14 +14,19 @@ var path = require('path');
 var colors = require('colors');
 var repl = require('repl');
 var stubber = require('async-repl/stubber');
+var jsonfile = require('jsonfile')
+if(fs.existsSync("./parasol.js")){
+    var config = require(process.cwd()+'/parasol.js');
+}
 
 var replInstance = null;
 
 program
-  .version('1.0.0')
+  .version('1.0.3')
   .option('init', 'Initialize a new Parasol project in this folder')
   .option('dev', 'Run development environment (Default)')
   .option('deploy [network]', 'Deploy to network (Default network: Mainnet)')
+  .option('interact [network]', 'Interact with deployed contracts on a [network]')
   .option('test', 'Run unit tests')
   .parse(process.argv);
 
@@ -31,7 +36,7 @@ program
     if((networklist.indexOf(network) > -1)) {
         var web3 = new Web3('https://'+network+'.infura.io');
     } else if(network != "dev") { 
-        var web3 = new Web3();
+        var web3 = new Web3(network);
     }
     if(network != "dev" && Array.isArray(accounts) && accounts.length > 0){
         var addresses = []
@@ -97,8 +102,8 @@ program
         if(network === "dev" && (program.dev || !process.argv.slice(2).length)) {
             replInstance.displayPrompt()
         }
-        config.deployer(instances, network, web3, function(contracts, net){
-            if(net === "dev"){ // Only runs tests in dev environment
+        config.deployer(instances, network, web3, function(contracts){
+            if(contracts[Object.keys(contracts)[0]].currentProvider.ganache === true){ // Only runs tests in dev environment
                 var Mocha = require('mocha');
                 var mocha = new Mocha();
                 var testDir = process.cwd() + '/tests'
@@ -129,6 +134,31 @@ program
                     }
                 });
             }
+        },
+        function(contracts){
+            if(contracts[Object.keys(contracts)[0]].currentProvider.ganache === undefined) {
+                const assign = require('assign-deep');
+                for (var contract in contracts) {
+                    var host = contracts[contract].currentProvider.host
+                    var network = /(?<=https:\/\/).*?(?=.infura.io)/.exec(host)
+                    const file = process.cwd() + '/addressbook.json';
+                    var addressbook = jsonfile.readFileSync(file)
+                    if(network === null){
+                        var obj = {
+                            [host]:{
+                                [contract]:contracts[contract].options.address
+                            }
+                        }
+                    }else {
+                        var obj = {
+                            [network]:{
+                                [contract]:contracts[contract].options.address
+                            }
+                        }
+                    var result = assign(addressbook, obj)                    }
+                    jsonfile.writeFileSync(file, result, { spaces:2 })
+                }
+            }
         });
         docs(contractDocs)
     }
@@ -136,8 +166,9 @@ program
 
 if (program.dev || !process.argv.slice(2).length) {
     if (fs.existsSync("./parasol.js")) {
-        var config = require(process.cwd()+'/parasol.js');
-        var web3 = new Web3(ganache.provider(config.dev));
+        var provider = ganache.provider(config.dev)
+        provider.ganache = true;
+        var web3 = new Web3(provider);
         console.log(('Ethereum development network running on port ' + config.dev.port).blue)
         web3.eth.getAccounts().then(function(accounts){
             replInstance = repl.start({ prompt: 'parasol> '.bold.cyan, useGlobal:true, ignoreUndefined:true, useColors:true });
@@ -215,8 +246,9 @@ if (program.init) {
 
 if(program.test) {
     if (fs.existsSync("./parasol.js")) {
-        var config = require(process.cwd()+'/parasol.js');
-        var web3 = new Web3(ganache.provider(config.dev));
+        var provider = ganache.provider(config.dev)
+        provider.ganache = true;
+        var web3 = new Web3(provider);
         console.log(('Ethereum development network running on port ' + config.dev.port).blue)
         web3.eth.getAccounts().then(function(accounts){
             compile(web3, accounts, "dev");
@@ -230,7 +262,6 @@ global.deploy = function(network){
     if(network === true || network === ""){
         network = "mainnet"
     }
-    var config = require(process.cwd()+'/parasol.js');
     var secrets = require(process.cwd()+'/secrets.json');
     console.log(('Deploying contracts to ' + network).blue)
     compile(web3, secrets, network);
@@ -242,4 +273,91 @@ if(program.deploy) {
     } else {
         console.log('This is not a valid Parasol project. Please run "parasol init" in an empty directory to initialize a new project.'.red)
     }    
+}
+
+if(program.interact) {
+    (async function () {
+        var network = "mainnet"
+        if(program.interact != true){
+            network = program.interact
+        }
+        var networklist = ['mainnet', 'ropsten', 'infuranet', 'kovan', 'rinkeby']
+        if((networklist.indexOf(network) > -1)) {
+            global.web3 = new Web3('https://'+network+'.infura.io');
+        } else { 
+            global.web3 = new Web3(network);
+        }
+
+        var addressbook = require(process.cwd()+'/addressbook.json');
+        if(typeof addressbook[network] === "undefined") {
+            console.log(("There are no contracts registered for this network in your address book. Please make sure you deploy your contracts to " + network + " first").red)
+            process.exit()
+        }
+
+        var files = read(process.cwd() + '/ABI');
+
+        global.contracts = {}
+
+        for (var i = 0; i < files.length; i++) {
+            var newName = files[i].replace("_",".").replace("-",":").slice(0, -5)
+            var interface = JSON.parse(fs.readFileSync(process.cwd() + "/ABI/" + files[i], 'utf8'));
+            contracts[newName] = new global.web3.eth.Contract(interface, addressbook[network][newName])
+        }
+
+        if(contracts.length === 0){
+            console.log('There are are no contract interfaces in your ABI/ directory. Please deploy your contracts first'.red)
+            process.exit()
+        }
+
+        if(fs.existsSync("./secrets.json")){
+            var accounts = require(process.cwd()+'/secrets.json');
+            var addresses = []
+            for (var i = 0; i < accounts.length; i++) {
+                if(!accounts[i].startsWith('0x')){
+                    accounts[i] = '0x'+accounts[i]
+                }
+                addresses[i] = await global.web3.eth.accounts.wallet.add(accounts[i]).address;
+            }
+            global.accounts = addresses;
+        }else{
+            global.accounts = {}
+        }
+        global.address0 = "0x0000000000000000000000000000000000000000";
+        global.assert = require('assert');
+        global.assertRevert = function(e) {
+            global.assert(e.results[Object.keys(e.results)[0]].error, 'revert')
+        }
+        console.log(('Parasol interacting with contracts on ' + network).blue)
+        replInstance = repl.start({ prompt: 'parasol> '.bold.cyan, useGlobal:true, ignoreUndefined:true, useColors:true });
+        replInstance.defineCommand('help', {
+            action: function(){
+                console.log(`
+Parasol global variables:
+    web3         web3 1.0 already attached to the Ganache provider and 10 generated accounts funded with 100 ETH each
+    contracts    Object of contract instances deployed on ganache. Key is relative location from contracts/ folder + ":" + contract name
+    address0     Short for 0x00000000000000000000000000000000000 also known as address(0) in solidity. Useful to reduce code redundancy
+    accounts     Array of public Ethereum addresses of accounts attached to the above web3 instance
+    assert       The native Node.js assertion module required for basic unit tests
+    assertRevert Special assertion function used to assert failure of a web3 send transaction. Takes a Promise error as an argument.
+REPL commands:
+    .break       Sometimes you get stuck, this gets you out
+    .clear       Alias for .break
+    .editor      Enter editor mode
+    .exit        Exit the repl
+    .help        Print this help message
+    .history     Show the history
+    .load        Load JS from a file into the REPL session
+    .save        Save all evaluated commands in this REPL session to a file
+Documentation:
+https://developer.lamarkaz.com/parasol
+                `)
+                replInstance.displayPrompt()
+            }
+        })
+        replInstance.on('exit', () => {
+            console.log('Shutting down Parasol interaction console'.blue);
+            process.exit();
+        });
+        stubber(replInstance);
+    })()
 }

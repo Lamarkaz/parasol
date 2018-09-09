@@ -22,7 +22,7 @@ if(fs.existsSync("./parasol.js")){
 var replInstance = null;
 
 program
-  .version('1.0.3')
+  .version(require('./package.json').version)
   .option('init', 'Initialize a new Parasol project in this folder')
   .option('dev', 'Run development environment (Default)')
   .option('deploy [network]', 'Deploy to network (Default network: Mainnet)')

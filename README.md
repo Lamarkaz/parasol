@@ -42,6 +42,22 @@ Don't worry, this file is `.gitignore`d on the repo. It will never be exposed us
 If you only run `parasol deploy`, the contracts will be deployed to the mainnet by default.
 3. To interact with your live contracts using the interactive Javascript session, simply type:
 `parasol interact [network]` where `[network]` is a network from the list above. The default network is `mainnet`.
+<<<<<<< HEAD
+=======
+
+## Project Structure
+After running `parasol init`, the resulting project structure is described below. All top-level directories and files are required for Parasol to function properly. That said, feel free to modify anything if you know what you're doing.
+```
+├── ABI/              Location of generated ABI files for each contract
+├── contracts/        Solidity smart contracts location
+|   ├── Token.sol     Sample contract of a minimum viable token contract
+├── docs/             Location of generated markdown docs
+├── tests/            Mocha unit tests location
+|   ├── Token.js      Minumum sample unit token for the Token contract
+├── .gitignore        Git Ignore file. Important to protect secrets.json file from being uploaded on commits
+├── parasol.js        Parasol configuration file
+```
+>>>>>>> 2cb99bb2ecf621b99e6dbf65aab5a93c50ee54e3
 
 ## Unit Tests
 All Javascript mocha unit tests must be inside the `tests` directory in order to run. The tests are automatically run on `parasol` and are rerun on file changes in the tests, Solidity contracts or the `parasol.js` config file. Alternatively, you may run tests manually using `parasol test`. Unit tests in Parasol have no restrictions on file names or location inside the tests folder; they are disconnected from smart contract names and file names.

@@ -51,7 +51,10 @@ program
     if(config.contracts === "*"){
         var contracts = read(process.cwd() + '/contracts/')
     }else{
-        var contracts = config.contracts
+        var contracts = []
+        for (var i = 0; i < config.contracts; i++) {
+            contracts.push(read(process.cwd() + '/contracts/'+config.contracts[i])); //TODO: Test
+        }
     }
     var sources = {}
     for (var i = 0; i < contracts.length; i++) {
@@ -63,7 +66,8 @@ program
         }
     }
     var output = solc.compile({ sources, settings:config.solc }, 1)
-    var abort = false;
+    var 
+abort = false;
     // Print errors
     var errors = output.errors;
     if(errors != null) {
@@ -78,6 +82,8 @@ program
     }
     if(abort) {
         console.log("Errors have been found while compiling contracts. Aborting.".red)
+        watcher.close();
+        process.exit()
     }else{
         rimraf.sync(process.cwd() + '/ABI/*');
         var contractDocs = [];

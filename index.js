@@ -74,7 +74,7 @@ program
                 abort = true;
                 console.log(errors[i].red)
             } else {
-                console.log(errors[i].red.yellow)
+                console.log(errors[i].yellow)
             }
         }
     }
@@ -91,8 +91,9 @@ program
                 var cDocs = metadata;
                 metadata.contractName = contractName;
                 contractDocs.push(cDocs);
-                var ABI = metadata.output.abi
-                var instance = new web3.eth.Contract(ABI, {data: '0x'+output.contracts[contractName].bytecode, from:accounts[0], gasPrice:"0", gas: 6000000});
+                var ABI = metadata.output.abi;
+                var bytecode = output.contracts[contractName].bytecode;
+                var instance = new web3.eth.Contract(ABI, {data: bytecode, from:accounts[0], gasPrice:"0", gas: 6000000});
                 instances[contractName] = instance;
                 var filename = contractName.replace(".","_").replace(":","-") + '.json';
                 fse.outputFileSync(process.cwd() + '/ABI/' + filename,JSON.stringify(ABI, null, 2),{encoding:'utf8',flag:'w'});

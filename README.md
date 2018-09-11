@@ -11,7 +11,7 @@ Agile Smart Contract Development Environment
 * Unopinionated design, low design pattern restrictions
 
 ## Installation
-`sudo npm -g parasol-cli`
+`sudo npm i -g parasol-cli`
 
 `parasol --help` for list of commands
 ## Usage

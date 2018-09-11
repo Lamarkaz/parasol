@@ -81,8 +81,6 @@ program
     }
     if(abort) {
         console.log("Errors have been found while compiling contracts. Aborting.".red)
-        watcher.close();
-        process.exit()
     }else{
         rimraf.sync(process.cwd() + '/ABI/*');
         var contractDocs = [];

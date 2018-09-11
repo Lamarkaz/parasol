@@ -32,6 +32,7 @@ program
 
   
   var compile = async function(web3, accounts, network) {
+    var config = require(process.cwd()+'/parasol.js');
     var networklist = ['mainnet', 'ropsten', 'infuranet', 'kovan', 'rinkeby']
     if((networklist.indexOf(network) > -1)) {
         var web3 = new Web3('https://'+network+'.infura.io');

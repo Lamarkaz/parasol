@@ -85,16 +85,18 @@ program
         var contractDocs = [];
         var instances = {}
         for (var contractName in output.contracts) {
-            console.log(("Deploying " + contractName).blue);
-            var metadata = JSON.parse(output.contracts[contractName].metadata)
-            var cDocs = metadata;
-            metadata.contractName = contractName;
-            contractDocs.push(cDocs);
-            var ABI = metadata.output.abi
-            var instance = new web3.eth.Contract(ABI, {data: '0x'+output.contracts[contractName].bytecode, from:accounts[0], gasPrice:"0", gas: 6000000});
-            instances[contractName] = instance;
-            var filename = contractName.replace(".","_").replace(":","-") + '.json';
-            fse.outputFileSync(process.cwd() + '/ABI/' + filename,JSON.stringify(ABI, null, 2),{encoding:'utf8',flag:'w'});
+            if(output.contracts[contractName].metadata.length > 0){ //Skip interface contracts
+                console.log(("Deploying " + contractName).blue);
+                var metadata = JSON.parse(output.contracts[contractName].metadata)
+                var cDocs = metadata;
+                metadata.contractName = contractName;
+                contractDocs.push(cDocs);
+                var ABI = metadata.output.abi
+                var instance = new web3.eth.Contract(ABI, {data: '0x'+output.contracts[contractName].bytecode, from:accounts[0], gasPrice:"0", gas: 6000000});
+                instances[contractName] = instance;
+                var filename = contractName.replace(".","_").replace(":","-") + '.json';
+                fse.outputFileSync(process.cwd() + '/ABI/' + filename,JSON.stringify(ABI, null, 2),{encoding:'utf8',flag:'w'});
+            }
         }
         if(network === "dev" && (program.dev || !process.argv.slice(2).length)) {
             replInstance.displayPrompt()

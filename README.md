@@ -57,5 +57,8 @@ Parasol aims to implement as little abstraction on top of its dependencies as po
 #### 3. Agility
 Agile development is important for the entire smart contract development cycle, not only for the Solidity contracts themselves. In the realm of Solidity, unit tests can end up taking substantially longer to perfect than their source contracts. Hence, they consume more time. And then comes, documentation. In Parasol's development environment, any changes made to unit tests, smart contract source code or any js/json file will immediately and quickly recompile all code, run static analysis, redeploy on ganache, recompile documentation and rerun unit tests. 
 
+## Future
+* Integrating Solidity style & security linting and auto-fixing using [Solium](https://solium.readthedocs.io/en/latest/).
+
 ## Contributions
 are very welcome

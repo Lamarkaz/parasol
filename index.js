@@ -136,28 +136,26 @@ program
             }
         },
         function(contracts){
-            if(contracts[Object.keys(contracts)[0]].currentProvider.ganache === undefined) {
-                const assign = require('assign-deep');
-                for (var contract in contracts) {
-                    var host = contracts[contract].currentProvider.host
-                    var network = /(?<=https:\/\/).*?(?=.infura.io)/.exec(host)
-                    const file = process.cwd() + '/addressbook.json';
-                    var addressbook = jsonfile.readFileSync(file)
-                    if(network === null){
-                        var obj = {
-                            [host]:{
-                                [contract]:contracts[contract].options.address
-                            }
+            const assign = require('assign-deep');
+            for (var contract in contracts) {
+                var host = contracts[contract].currentProvider.host
+                var network = /(?<=https:\/\/).*?(?=.infura.io)/.exec(host)
+                const file = process.cwd() + '/addressbook.json';
+                var addressbook = jsonfile.readFileSync(file)
+                if(network === null){
+                    var obj = {
+                        [host]:{
+                            [contract]:contracts[contract].options.address
                         }
-                    }else {
-                        var obj = {
-                            [network]:{
-                                [contract]:contracts[contract].options.address
-                            }
+                    }
+                }else {
+                    var obj = {
+                        [network]:{
+                            [contract]:contracts[contract].options.address
                         }
-                    var result = assign(addressbook, obj)                    }
-                    jsonfile.writeFileSync(file, result, { spaces:2 })
-                }
+                    }
+                var result = assign(addressbook, obj)                    }
+                jsonfile.writeFileSync(file, result, { spaces:2 })
             }
         });
         docs(contractDocs)

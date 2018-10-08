@@ -1,5 +1,11 @@
 # Parasol
+
+<p align="center">
 Agile Smart Contract Development Environment
+<br>
+<br>
+  <img src="terminal.gif" />
+</p>
 
 ## Features
 * Instant zero-configuration contract deployments using INFURA

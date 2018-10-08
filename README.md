@@ -3,7 +3,6 @@
 <p align="center">
 Agile Smart Contract Development Environment
 <br>
-<br>
   <img src="terminal.gif" />
 </p>
 

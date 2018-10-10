@@ -63,7 +63,7 @@ program
     var sources = {}
     for (var i = 0; i < contracts.length; i++) {
         if(sources[contracts[i]] != null) {
-            logger.warning("Warning: Duplicated file name found: " + contracts[i]) // Is this necessary?
+            logger.warn("Warning: Duplicated file name found: " + contracts[i]) // Is this necessary?
         } else {
             sources[contracts[i]] = fs.readFileSync(process.cwd() + '/contracts/' + contracts[i], 'utf8');
         }
@@ -122,7 +122,7 @@ program
                 context.parasol.executeErrors(errors)
                 logger.error(errors[i])
             } else {
-                logger.warning(errors[i])
+                logger.warn(errors[i])
             }
         }
     }

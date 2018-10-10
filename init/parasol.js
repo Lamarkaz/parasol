@@ -7,7 +7,7 @@ module.exports = {
         //logger:console,
         gasPrice: 0
     },
-    contracts : "*", // To select specific contracts, replace it with an array: ["File1.sol", "Folder/File2.sol"]
+    contracts : "*", // To select specific contract locations, replace it with an array: ["File1.sol", "Folder/File2.sol"]
     solc: { // Solidity compiler options (https://solidity.readthedocs.io/en/develop/using-the-compiler.html)
         optimizer: {
           enabled: true,
@@ -31,14 +31,29 @@ module.exports = {
           }
         }
     },
+    preprocessor: {
+        context: {
+            title: "A minimal token contract",
+            tokenSupply: "1*10**28",
+            tokenName: "Token",
+            tokenDecimals:18,
+            tokenSymbol: "TOK"
+        },
+        settings: { // Underscore.js.template settings. Read more: https://underscorejs.org/#template
+            evaluate:    /{{([\s\S]+?)}}/g,
+            interpolate: /{{=([\s\S]+?)}}/g,
+            escape:      /{{-([\s\S]+?)}}/g
+        },
+        strict: false // If true, strict mode will abort deployment on warnings as well as errors
+    },
     deployer: async function (contracts, network, web3, test, save) {
         for (var contract in contracts) {
             var gasPrice = "50000000000"; //50 Gwei
             if(network === "dev") {
                 gasPrice = "0";
             }
-            contracts[contract] = await contracts[contract].deploy().send({from: web3.eth.accounts[0], gasPrice, gas:1000000})
-            console.log(contract + " deployed at address " + contracts[contract].options.address)
+            contracts[contract] = await contracts[contract].deploy().send({from: web3.eth.accounts[0], gasPrice, gas:6000000})
+            console.log(("Contract " + contract + " deployed at address " + contracts[contract].options.address).green)
         }
         save(contracts) // Saves contract addresses to addressbook.json. Development addresses will never be saved to addressbook.
         test(contracts) // Call the test function if you want to run unit tests after deployment. Tests will only run if network is dev

@@ -1,6 +1,6 @@
 {
   "name": "parasol-cli",
-  "version": "1.1.8",
+  "version": "2.0.0",
   "description": "Powerful Smart Contract Development Environment",
   "main": "index.js",
   "bin": {
@@ -34,10 +34,14 @@
     "ganache-cli": "^6.1.8",
     "handlebars": "^4.0.11",
     "jsonfile": "^5.0.0",
+    "log-symbols": "^2.2.0",
     "mocha": "^5.2.0",
     "node-watch": "^0.5.8",
+    "psol": "^1.0.9",
+    "resnap": "^1.0.1",
     "rimraf": "^2.6.2",
     "solc": "^0.4.24",
+    "underscore.template": "^0.1.7",
     "web3": "^1.0.0-beta.35"
   }
 }

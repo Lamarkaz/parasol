@@ -1,0 +1,110 @@
+pragma solidity ^0.4.24;
+
+{{ // strict = true }}
+{{ // abort("just for fun") }}
+{{ // ignore(this) }}
+
+/// @title {{= title }}
+contract Token {
+
+    string private _name = "{{= tokenName}}";
+    string private _symbol = "{{= tokenSymbol}}";
+    uint8 private _decimals = {{= tokenDecimals}};
+    uint256 private _totalSupply = {{= tokenSupply}};
+    
+    mapping (address => uint256) public _balances;
+
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+
+    constructor() public {
+        _balances[msg.sender] = _totalSupply;
+    }
+
+    /**
+    * @dev Transfer token for a specified addresses
+    * @param _to The address to transfer to.
+    * @param _value The amount to be transferred.
+    */
+    function transfer(address _to, uint256 _value) public returns (bool success) {
+        require(_balances[msg.sender] >= _value);
+        _balances[msg.sender] -= _value;
+        _balances[_to] += _value;
+        emit Transfer(msg.sender, _to, _value);
+        return true;
+    }
+
+    /// @author Nour Haridy
+    /// @dev Checks balance of address
+    /// @param _owner The queried address
+    /// @return balance of address
+    function balanceOf(address _owner) constant public returns (uint256 balance) {
+        return _balances[_owner];
+    }
+
+    /**
+    * @return the name of the token.
+    */
+    function name() public view returns(string) {
+        return _name;
+    }
+
+    /**
+    * @return the symbol of the token.
+    */
+    function symbol() public view returns(string) {
+        return _symbol;
+    }
+
+    /**
+    * @return the number of decimals of the token.
+    */
+    function decimals() public view returns(uint8) {
+        return _decimals;
+    }
+
+    // Preprocessor directive. Only compiles if in 'dev' network
+    {{ if (network === "dev") { }}
+
+    /// @dev Force transfers tokens from any account to another. Only compiled in 'dev' network
+    /// @param _from The address of the transfer sender
+    /// @param _to The address of the transfer recipient
+    /// @param _value The amount of tokens to be transferred
+    /// @return true if tokens transferred successfully
+    function forceTransfer(address _from, address _to, uint256 _value) public returns (bool success) {
+        require(_balances[_from] >= _value);
+        _balances[_from] -= _value;
+        _balances[_to] += _value;
+        emit Transfer(_from, _to, _value);
+        return true;
+    }
+
+    {{ } }}
+
+}
+
+{{
+
+    //parasol.onCompiled(this, function(fileName){
+    //    console.log("File: " + fileName + " compiled")
+    //})
+
+    //parasol.onError(this, function(e){
+    //    console.log("error: " + e)
+    //})
+
+    //parasol.onDeployed(this, function(contract, contractName){
+    //    console.log('Deployed')
+    //})
+
+    //parasol.onAllDeployed(async function(contracts){
+    //    console.log(await contracts["Token.psol:Token"].methods.balanceOf(accounts[0]).call())
+    //})
+
+    test(this, 'Transfer() should change balance after transfer', async function() {
+        var preBalance = await contracts["Token.psol:Token"].methods.balanceOf(accounts[0]).call()
+        await contracts["Token.psol:Token"].methods.transfer(accounts[1], 1).send()
+        var postBalance = await contracts["Token.psol:Token"].methods.balanceOf(accounts[0]).call()
+        assert.notEqual(preBalance, postBalance)
+    })
+
+}}

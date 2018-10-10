@@ -1,6 +1,6 @@
 {
   "name": "parasol-cli",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Powerful Smart Contract Development Environment",
   "main": "index.js",
   "bin": {

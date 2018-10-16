@@ -19,12 +19,22 @@ var stubber = require('async-repl/stubber');
 var psol = require('psol')
 var logger = require('./logger');
 const resnap = require('resnap')()
+const CFonts = require('cfonts');
 
 if(fs.existsSync("./parasol.js")){
     var config = require(process.cwd()+'/parasol.js');
 }
 
 var replInstance = null;
+
+var fonts = ['3d', 'block', 'simple', 'simple3d', 'huge'];
+
+CFonts.say('Parasol', {
+    font: fonts[Math.floor(Math.random()*fonts.length)],
+    colors:['yellow', 'redBright']
+});
+console.log(('You are using Parasol ' + require('./package.json').version).cyan);
+console.log(('Documentation: https://developer.lamarkaz.com/parasol \n').cyan)
 
 program
   .version(require('./package.json').version)

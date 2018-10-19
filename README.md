@@ -7,10 +7,11 @@ Agile Smart Contract Development Environment
 </p>
 
 ## Features
+* First-ever [Solidity Preprocessor](https://github.com/Lamarkaz/psol) & macros
 * Instant zero-configuration contract deployments using INFURA
 * Async-REPL Javascript session to interact with deployed contracts & web3
 * Integrated Markdown contract documentation using Natspec + ABI
-* Extended Mocha unit tests
+* Standalone and inline Mocha unit tests
 * Auto-recompiling, tests & documentation on file change
 * Unlimited customizability, exposure of all dependency configs
 * Unopinionated design, low design pattern restrictions
@@ -50,6 +51,9 @@ If you only run `parasol deploy`, the contracts will be deployed to the mainnet 
 
 ## Unit Tests
 All Javascript mocha unit tests must be inside the `tests` directory in order to run. The tests are automatically run on `parasol` and are rerun on file changes in the tests, Solidity contracts or the `parasol.js` config file. Alternatively, you may run tests manually using `parasol test`. Unit tests in Parasol have no restrictions on file names or location inside the tests folder; they are disconnected from smart contract names and file names.
+
+## Solidity Preprocessor
+We developed [Psol](https://github.com/Lamarkaz/psol), the first ever Solidity lexical preprocessor, in order to enhance smart contract development in ways that were never possible before. The possibilities include Vue-style single file components, inline code-describing unit tests, precompilation macro substitution, conditional compilation, remote dependency auto-fetching and many others. Because Parasol is about freedom, the usage of the preprocessor is completely optional. Only files that end with the `.psol` extension in the `contracts/` directory will be preprocessed. Parasol provides a number of variables by default to the preprocessor context, including the `web3` instance, the `accounts` array, a `test()` function and others.
 
 ## Documentation Generation
 Just running the `parasol` command, or in addition to any of the `dev`, `deploy` and `test` arguments will automatically generate a single `README.md` markdown file in the `docs/` directory containing Natspec Devdoc and ABI documentation for all compiled contracts. Additionally, while actively running the `parasol` command, the documentation file will be regenerated on every change.

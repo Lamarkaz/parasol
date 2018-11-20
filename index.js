@@ -157,6 +157,9 @@ program
                 contractDocs.push(cDocs);
                 var ABI = metadata.output.abi;
                 var bytecode = output.contracts[contractName].bytecode;
+                if (!bytecode.startsWith('0x')) {
+                    bytecode = '0x'+bytecode;
+                }
                 var instance = new web3.eth.Contract(ABI, {data: bytecode, from:accounts[0], gasPrice:"0", gas: 6000000});
                 instances[contractName] = instance;
                 var filename = contractName.replace(".","_").replace(":","-") + '.json';

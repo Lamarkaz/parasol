@@ -71,5 +71,5 @@ Agile development is important for the entire smart contract development cycle, 
 * Parasol Decentralized Package Manager
 * Solidity style & security linting and auto-fixing using [Solium](https://solium.readthedocs.io/en/latest/).
 
-## Contributions
-are very welcome
+## Contribute
+We actively welcome pull requests. Learn how to [contribute](https://github.com/Lamarkaz/parasol/blob/master/CONTRIBUTING.md).

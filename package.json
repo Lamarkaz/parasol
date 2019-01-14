@@ -40,7 +40,7 @@
     "psol": "^1.0.9",
     "resnap": "^1.0.1",
     "rimraf": "^2.6.2",
-    "solc": "^0.4.24",
+    "solc": "^0.5.2",
     "underscore.template": "^0.1.7",
     "web3": "^1.0.0-beta.35"
   }
